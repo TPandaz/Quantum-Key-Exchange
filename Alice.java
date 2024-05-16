@@ -1,6 +1,8 @@
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
@@ -27,19 +29,19 @@ public class Alice {
             System.out.println("Bob is connected!");
 
             InputStream inputStream = bobSocket.getInputStream();
-            //PrintWriter writer = new PrintWriter(bobSocket.getOutputStream());
             OutputStream outputStream = bobSocket.getOutputStream();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
-            // send stream of qubits to bob
+            // send stream of random qubits to bob
             int qubitLength = Integer.parseInt(args[0]);
             ArrayList<Qubit> qubitStream = new ArrayList<>(qubitLength);
             for (int i = 0; i < qubitLength; i++) {
-                qubitStream.add(new Qubit());
+                qubitStream.add(new Qubit()); //add random qubits
             }
             ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
          
             for (Qubit qubit : qubitStream) {
-                // Combine polarization and value into a single byte
+                // pack polarization and value into a single byte
                 byte combinedByte = (byte) ((qubit.getPolarization() << 1) | qubit.getValue());
                 byteStream.write(combinedByte);
                 System.out.println("combined byte: " + Integer.toBinaryString(combinedByte));
@@ -47,34 +49,47 @@ public class Alice {
             outputStream.write(byteStream.toByteArray());
             outputStream.flush();
 
+
             // receive byte stream from Bob and place into arraylist of qubits
+            //polarization type is already known???
             byte[] receivedBytes = new byte[qubitLength ];
             int bytesRead = inputStream.read(receivedBytes);
             ArrayList<Qubit> receivedQubits = new ArrayList<>();
             for (int i = 0; i < qubitLength; i++) {
                 byte combinedByte = receivedBytes[i];
-                // Extract polarization (MSB)
+                // get polarization (MSB)
                 int polarization = (combinedByte & 2) >> 1; // AND with 2 to get MSB, then right shift
-                // Extract value (LSB)
+                // get value (LSB)
                 int value = combinedByte & 1;
                 System.out.println("received polarization: " + polarization + " value: " + value);
                 receivedQubits.add(new Qubit(value, polarization));
             }
 
+            //  //debugger
+            //  System.out.println("received qubits:");
+            //  for(Qubit qubit : receivedQubits){
+            //     System.out.println("polarization: " + qubit.getPolarization() + " value: " + qubit.getValue());
+            // }
+            // System.out.println();
+            // System.out.println("qubitStream:");
+            // for(Qubit qubit : qubitStream){
+            //     System.out.println("polarization: " + qubit.getPolarization() + " value: " + qubit.getValue());
+            // }
 
-             //debugger
-             for(Qubit qubit : receivedQubits){
-                System.out.println("received qubits:");
-                System.out.println("polarization: " + qubit.getPolarization() + " value: " + qubit.getValue());
-            }
-            System.out.println();
-            for(Qubit qubit : qubitStream){
-                System.out.println("qubitStream:");
-                System.out.println("polarization: " + qubit.getPolarization() + " value: " + qubit.getValue());
-            }
             //generate key
             StringBuilder key = getSecretKey(qubitStream, receivedQubits);
             System.out.println(key);
+
+            //communication loop
+            while(true){
+                String messageToSend = reader.readLine();
+                //quit program if message is quit
+                if(messageToSend.equals("quit")){
+                    break;
+                }
+                String encryptedMessage = Cipher.xor(messageToSend, key.toString());
+                System.out.println(encryptedMessage);
+            }
 
             inputStream.close();
             outputStream.close();

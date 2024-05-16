@@ -25,7 +25,7 @@ public class Qubit{
             return this.value;
         }else{
             int value = (int)Math.round(Math.random());
-            set(value, polarization);
+            //set(value, polarization);
             return value;
         }
     }

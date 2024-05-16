@@ -21,7 +21,6 @@ public class Bob {
             //receive stream of qubits and place into arraylist
             byte[] receivedBytes = new byte[qubitLength];
             int bytesRead = inputStream.read(receivedBytes);
-              
             ArrayList<Qubit> receivedQubits = new ArrayList<>();
             for (int i = 0; i < qubitLength; i++) {
                 byte combinedByte = receivedBytes[i];
@@ -30,18 +29,17 @@ public class Bob {
                 // Extract value (LSB)
                 int value = combinedByte & 1;
                 System.out.println("combined byte: " + Integer.toBinaryString(combinedByte));
-                System.out.println("received polarization: " + polarization + " value: " + value);
                 receivedQubits.add(new Qubit(value, polarization));
-                System.out.println("receivedqubits actual polarisation: " + receivedQubits.get(i).getPolarization());
+                System.out.println(" received Polarization: " +  polarization + " value: " + value);
             }
             
 
             //measure qubits with random polarization and place into arraylist
             ArrayList<Qubit> qubitStream = new ArrayList<>();
             for(int i = 0; i < qubitLength; i++){
-                // int polarization = (int)Math.round(Math.random());//random number of 0 or 1
-                // int value = receivedQubits.get(i).measure(polarization);
-                qubitStream.add(new Qubit(1, 0));
+                int polarization = (int)Math.round(Math.random());//random number of 0 or 1
+                int value = receivedQubits.get(i).measure(polarization);
+                qubitStream.add(new Qubit(value, polarization));
             }
 
             //send own qubitStream to Alice
@@ -50,21 +48,21 @@ public class Bob {
                 // Combine polarization and value into a single byte
                 byte combinedByte = (byte) ((qubit.getPolarization() << 1) | qubit.getValue());
                 byteStream.write(combinedByte);
-                System.out.println("Combined byte: " + Integer.toBinaryString(combinedByte));
+                System.out.println("sent Combined byte: " + Integer.toBinaryString(combinedByte));
               }
             outputStream.write(byteStream.toByteArray());
             outputStream.flush();
 
-            //debugger
-            for(Qubit qubit : receivedQubits){
-                System.out.println("received qubits:");
-                System.out.println("polarization: " + qubit.getPolarization() + " value: " + qubit.getValue());
-            }
-            System.out.println();
-            for(Qubit qubit : qubitStream){
-                System.out.println("qubitStream:");
-                System.out.println("polarization: " + qubit.getPolarization() + " value: " + qubit.getValue());
-            }
+            // //debugger
+            // System.out.println("received qubits:");
+            // for(Qubit qubit : receivedQubits){
+            //     System.out.println("polarization: " + qubit.getPolarization() + " value: " + qubit.getValue());
+            // }
+            // System.out.println();
+            // System.out.println("qubitStream:");
+            // for(Qubit qubit : qubitStream){
+            //     System.out.println("polarization: " + qubit.getPolarization() + " value: " + qubit.getValue());
+            // }
             //generate key
             StringBuilder key = getSecretKey(qubitStream, receivedQubits);
             System.out.println(key);
