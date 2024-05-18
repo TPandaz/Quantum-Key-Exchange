@@ -15,15 +15,17 @@ public class QKE {
         // create 2 endpoint machines
         EndPoint sender = new EndPoint();
         EndPoint receiver = new EndPoint();
-        boolean isValidKey = false;
+        boolean validKey = false;;
 
-        while (!isValidKey) {
-            // generate keys for sender and receiver
-            generateKeys(qubitLength, sender, receiver, isValidKey);
+        while(!validKey){
+            generateKey(qubitLength, sender, receiver);
+            String key = sender.getKey().toString();
+            validKey = isKeyValid(key);
         }
 
         System.out.println("receiver's keys: " + receiver.getKey());
         System.out.println("sender's keys: " + sender.getKey());
+        System.out.println("Type Message: ");
 
         // sender encrypts chars typed in console and sends to receiver, receiver
         // decrypts message and prints to console
@@ -57,41 +59,35 @@ public class QKE {
 
     }
 
-    public static void generateKeys(int qubitLength, EndPoint sender, EndPoint receiver, boolean isValidKey) {
-        // generate stream of random qubits for sender
-        ArrayList<Qubit> qubitArrayList = new ArrayList<>(qubitLength);
-        for (int i = 0; i < qubitLength; i++) {
-            // add qubits with random polarisations and values
-            qubitArrayList.add(new Qubit());
-        }
-        sender.setQubitStream(qubitArrayList);
-        // copy qubit stream from sender to receiver
-        ArrayList<Qubit> copiedQubitStream = new ArrayList<>();
-        for (Qubit qubit : sender.getQubitStream()) {
-            copiedQubitStream.add(new Qubit(qubit.getValue(), qubit.getPolarization()));
-        }
-        receiver.setQubitStream(copiedQubitStream);
-        // receiver measures received qubit stream, changing the recorded polarizations
-        // & values in the qubitstream
-        for (Qubit qubit : receiver.getQubitStream()) {
-            int randomPolarization = (int) Math.round(Math.random()); // random number of 0 or 1
-            qubit.measure(randomPolarization);
-        }
-        sender.setKey(sender.getQubitStream(), receiver.getQubitStream());
-        receiver.setKey(sender.getQubitStream(), receiver.getQubitStream());
-        // while loop continues as it is not a valid key
-        if (checkValidKey(sender.getKey().toString()) && checkValidKey(receiver.getKey().toString())) {
-            isValidKey = true;
-        } else {
-            System.out.println("Invalid Keys...reinitiating QKE");
-        }
+    public static void generateKey(int qubitLength, EndPoint sender, EndPoint receiver){
+         // generate stream of random qubits for sender
+         ArrayList<Qubit> qubitArrayList = new ArrayList<>(qubitLength);
+         for (int i = 0; i < qubitLength; i++) {
+             // add qubits with random polarisations and values
+             qubitArrayList.add(new Qubit());
+         }
+         sender.setQubitStream(qubitArrayList);
+         // copy qubit stream from sender to receiver
+         ArrayList<Qubit> copiedQubitStream = new ArrayList<>();
+         for (Qubit qubit : sender.getQubitStream()) {
+             copiedQubitStream.add(new Qubit(qubit.getValue(), qubit.getPolarization()));
+         }
+         receiver.setQubitStream(copiedQubitStream);
+         // receiver measures received qubit stream, changing the recorded polarizations
+         // & values in the qubitstream
+         for (Qubit qubit : receiver.getQubitStream()) {
+             int randomPolarization = (int) Math.round(Math.random()); // random number of 0 or 1
+             qubit.measure(randomPolarization);
+         }
+         sender.setKey(sender.getQubitStream(), receiver.getQubitStream());
+         receiver.setKey(sender.getQubitStream(), receiver.getQubitStream());
     }
 
-    // check if keys are null, empty, or contains alls 0s or numbers other than 0,1
-    public static boolean checkValidKey(String key) {
-        if (key == null || key.isEmpty() || !key.matches("^[01]+$")) {
+    public static boolean isKeyValid(String key){
+        if(key == null || key.isEmpty() || key.equals("0") || !key.matches("^[01]+$") || key.matches("^0*$")){
+            System.out.println("Key not valid...reestablishing keys");
             return false;
-        } else {
+        }else{
             return true;
         }
     }

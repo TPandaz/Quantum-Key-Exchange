@@ -230,28 +230,28 @@ public class UnitTests {
     @Test
     public void testInvalidCheckValidKeyfor0() {
         String key = "0";
-        Assertions.assertFalse(QKE.checkValidKey(key));
+        Assertions.assertFalse(QKE.isKeyValid(key));
     }
 
     // test checkvalid keys method returns false is key is a string of 0s
     @Test
     public void testInvalidCheckValidKeyfor0s() {
         String key = "00000000000";
-        Assertions.assertFalse(QKE.checkValidKey(key));
+        Assertions.assertFalse(QKE.isKeyValid(key));
     }
 
     // test checkvalid keys method returns false if key is empty
     @Test
     public void testInvalidCheckValidKeyforEmptyKey() {
         String key = "";
-        Assertions.assertFalse(QKE.checkValidKey(key));
+        Assertions.assertFalse(QKE.isKeyValid(key));
     }
 
     // test checkvalid keys method returns false if key is null
     @Test
     public void testInvalidCheckValidKeyforNullKey() {
         String key = null;
-        Assertions.assertFalse(QKE.checkValidKey(key));
+        Assertions.assertFalse(QKE.isKeyValid(key));
     }
 
     // test checkvalid keys method returns false if key contains numbers other than
@@ -259,49 +259,49 @@ public class UnitTests {
     @Test
     public void testInvalidCheckValidKeyforOtherNumbers() {
         String key = "92827389";
-        Assertions.assertFalse(QKE.checkValidKey(key));
+        Assertions.assertFalse(QKE.isKeyValid(key));
     }
 
     // test checkvalid keys method returns false if key a 0/1 with other numbers
     @Test
     public void testInvalidCheckValidKeyforEdge() {
         String key = "19280270389";
-        Assertions.assertFalse(QKE.checkValidKey(key));
+        Assertions.assertFalse(QKE.isKeyValid(key));
     }
 
     // test checkvalid keys method returns false if key contains other chars
     @Test
     public void testInvalidCheckValidKeyOtherChars() {
         String key = "1dsada";
-        Assertions.assertFalse(QKE.checkValidKey(key));
+        Assertions.assertFalse(QKE.isKeyValid(key));
     }
 
     // test if checkvalid keys returns true if key is 1
     @Test
     public void testValidKeysKey1() {
         String key = "1";
-        Assertions.assertTrue(QKE.checkValidKey(key));
+        Assertions.assertTrue(QKE.isKeyValid(key));
     }
 
     // test if checkvalid keys returns true if key is 10
     @Test
     public void testValidKeysKey10() {
         String key = "10";
-        Assertions.assertTrue(QKE.checkValidKey(key));
+        Assertions.assertTrue(QKE.isKeyValid(key));
     }
 
     // test if checkvalid keys returns true if key is 01
     @Test
     public void testValidKeysKey01() {
         String key = "01";
-        Assertions.assertTrue(QKE.checkValidKey(key));
+        Assertions.assertTrue(QKE.isKeyValid(key));
     }
 
     // test if checkvalid keys returns true if key is 101010
     @Test
     public void testValidKeysKey() {
         String key = "101010";
-        Assertions.assertTrue(QKE.checkValidKey(key));
+        Assertions.assertTrue(QKE.isKeyValid(key));
     }
 
     // test sender and receiver have same keys for 16
