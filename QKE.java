@@ -1,7 +1,7 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.security.SecureRandom;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
 public class QKE {
@@ -19,53 +19,63 @@ public class QKE {
         // generate stream of random qubits for sender
         ArrayList<Qubit> qubitArrayList = new ArrayList<>(qubitLength);
         for (int i = 0; i < qubitLength; i++) {
-            qubitArrayList.add(new Qubit()); // add random qubits
+            //add qubits with random polarisations and values
+            qubitArrayList.add(new Qubit()); 
         }
         sender.setQubitStream(qubitArrayList);
+     
 
-        // receiver receives stream of qubits from sender (simulated via
-        // getters/setters)
+        // receiver receives stream of qubits from sender (simulated via getters/setters)
 
-        // create deep copy of the sender qubit stream and set it to receiver qubitstream
+        //copy qubit stream from sender to receiver
         ArrayList<Qubit> copiedQubitStream = new ArrayList<>();
         for (Qubit qubit : sender.getQubitStream()) {
             copiedQubitStream.add(new Qubit(qubit.getValue(), qubit.getPolarization()));
         }
         receiver.setQubitStream(copiedQubitStream);
-        // currently does not know polarisations & values for qubit stream so it
-        // measures it, changing the recorded values in the receivers qubitstream
+
+        // receiver measures received qubit stream, changing the recorded polarizations & values in the qubitstream
         for (Qubit qubit : receiver.getQubitStream()) {
             int randomPolarization = (int) Math.round(Math.random()); // random number of 0 or 1
-            int value = qubit.measure(randomPolarization);
+            qubit.measure(randomPolarization);
         }
 
-        // // debug
-        // System.out.println("sender qubits:");
-        // for (Qubit qubit : sender.getQubitStream()) {
-        //     System.out.println("polarization: " + qubit.getPolarization() + " value: " + qubit.getValue());
-        // }
-        // System.out.println();
-        // System.out.println("receiver qubits:");
-        // for (Qubit qubit : receiver.getQubitStream()) {
-        //     System.out.println("polarization: " + qubit.getPolarization() + " value: " + qubit.getValue());
-        // }
-
-        //simulate exchanging polarizations between sender and receiver
+        //simulate exchanging polarizations between sender and receiver using getter/setter
+        //does this by comparing the polarizations of sneder and receivers qubit streams
         sender.setKey(sender.getQubitStream(), receiver.getQubitStream());
         receiver.setKey(sender.getQubitStream(), receiver.getQubitStream());
-        System.out.println(receiver.getKey() + " " + sender.getKey());
-        
-        //sender encrypts chars to console and send to receiver, receiver decrypts message and prints to console
+        System.out.println("receiver's keys: " + receiver.getKey());
+        System.out.println("sender's keys: " + sender.getKey());
+
+        //sender encrypts chars typed in console and sends to receiver, receiver decrypts message and prints to console
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         try{
             while(true){
                 String messageToSend = reader.readLine();
-                //quit program if message is quit
+                //quit program if "quit" is typed into console
                 if(messageToSend.equals("quit")){
                     break;
                 }
-                String encryptedMessage = Cipher.xor(messageToSend, sender.getKey().toString());
-                System.out.println(encryptedMessage);
+
+                //convert message to byte array
+                byte[] messageBytes = messageToSend.getBytes(StandardCharsets.UTF_8);
+                
+                //encrypt
+                byte[] encryptedMessage = Cipher.xor(messageBytes, sender.getKey().toString());
+                //set sender's encrypted msg
+                sender.setEncryptedMessage(encryptedMessage); 
+                System.out.println("encrypted msg: " + encryptedMessage);
+
+                //send to receiver
+                receiver.setEncryptedMessage(sender.getEncryptedMessage());
+                System.out.println("receiver's encrypted message: " + receiver.getEncryptedMessage());
+
+                //receiver decrypts message and prints to console
+                byte[] decryptedMessage = Cipher.xor(receiver.getEncryptedMessage(), receiver.getKey().toString());
+                String decryptedMessageString = new String(decryptedMessage, StandardCharsets.UTF_8);
+                System.out.println("receiver's decrypted message: " + decryptedMessageString);
+
+
             }
         }catch(IOException e){
             e.printStackTrace();
@@ -79,16 +89,10 @@ public class QKE {
 class endPoint {
     private ArrayList<Qubit> qubitStream;
     private StringBuilder key = new StringBuilder();
-    private String encryptedMessage;
-    private String ReceivedMessage;
-    private SecureRandom numGenerator = new SecureRandom();
+    private byte[] messageBytes;
 
     // constructor
     endPoint() {
-    }
-
-    public int randomPolarization() {
-        return numGenerator.nextInt(2);
     }
 
     // getter
@@ -104,6 +108,10 @@ class endPoint {
         return this.key;
     }
 
+    public byte[] getEncryptedMessage(){
+        return this.messageBytes;
+    }
+
     // setter
     public void setKey(ArrayList<Qubit> senderStream, ArrayList<Qubit> receiverStream){
          //compare polarisation types and append to key the value of qubits with matching polarizations
@@ -111,8 +119,7 @@ class endPoint {
          for(int i =0; i < qubitStream.size(); i++){
              if(senderStream.get(i).getPolarization() == receiverStream.get(i).getPolarization()){
                  this.key.append(senderStream.get(i).getValue());
-                 //System.out.println(senderStream.get(i).getValue());
-             }
+              }
          }
     }
 
@@ -120,11 +127,9 @@ class endPoint {
         this.qubitStream = qubitStream;
     }
 
-    public void setMessage(String message) {
-        this.encryptedMessage = message;
+    public void setEncryptedMessage(byte[] message) {
+        this.messageBytes = message;
     }
 
-    public void setReceivedMessage(String message) {
-        this.ReceivedMessage = message;
-    }
+  
 }
