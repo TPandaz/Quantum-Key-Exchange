@@ -1,4 +1,3 @@
-import java.util.Base64;
 
 public final class Cipher {
     // private constructor as an instance of this class is not required

@@ -95,7 +95,6 @@ class endPoint {
     endPoint() {
     }
 
-    // getter
     public ArrayList<Qubit> getQubitStream() {
         if (this.qubitStream != null) {
             return this.qubitStream;
@@ -115,7 +114,6 @@ class endPoint {
     // setter
     public void setKey(ArrayList<Qubit> senderStream, ArrayList<Qubit> receiverStream){
          //compare polarisation types and append to key the value of qubits with matching polarizations
-         StringBuilder key = new StringBuilder();
          for(int i =0; i < qubitStream.size(); i++){
              if(senderStream.get(i).getPolarization() == receiverStream.get(i).getPolarization()){
                  this.key.append(senderStream.get(i).getValue());
