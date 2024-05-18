@@ -13,41 +13,25 @@ public final class Cipher {
             char keyChar = key.charAt(i % key.length());
             int keyBit = keyChar - '0'; // convert character to bit value by subtracting ascii value of 48 from it
             // get current bit from byte array
-            int messageBytesArrayIndex = i /8;
+            int messageBytesArrayIndex = i / 8; //which byte loop is currently at
             int bitShiftPosition = 7 - (i % 8); // position of bit to rightshift by
             byte messageByte = messageBytes[messageBytesArrayIndex]; // current byte value we are xoring
             int messageBit = (messageByte >>> bitShiftPosition) & 1; // shift and mask to get leftmost bit
 
             // xor the bit with key
             int encryptedBit = messageBit ^ keyBit;
-
             // left shift by 1 and OR with encryptedbit(appends to the right)
             encryptedMessage[messageBytesArrayIndex] = (byte) ((encryptedMessage[messageBytesArrayIndex] << 1)
                     | encryptedBit);
-
-
         }
 
         System.out.println("XORed message in binary:");
         for (byte b : encryptedMessage) {
-            System.out.println(Integer.toBinaryString(b  & 0xFF)); // Ensure byte is treated as unsigned
+            System.out.println(Integer.toBinaryString(b & 0xFF)); // Ensure byte is treated as unsigned
         }
 
         return encryptedMessage;
 
-    }
-
-    public static String convertBytesToString(byte[] encryptedMessage) {
-        StringBuilder sb = new StringBuilder();
-        for (byte b : encryptedMessage) {
-            // Convert byte to unsigned int (optional)
-            int unsignedByte = b & 0xFF; // Ensures unsigned interpretation
-
-            // Convert unsigned int to char (assuming ASCII encoding)
-            char ch = (char) unsignedByte;
-            sb.append(ch);
-        }
-        return sb.toString();
     }
 
 }
