@@ -12,11 +12,10 @@ public final class Cipher {
             // get the current char in key and make it a bit value
             char keyChar = key.charAt(i % key.length());
             int keyBit = keyChar - '0'; // convert character to bit value by subtracting ascii value of 48 from it
-            // get current bit from byte array
-            int messageBytesArrayIndex = i / 8; //which byte loop is currently at
+            int messageBytesArrayIndex = i / 8; //which byte the loop is currently at
             int bitShiftPosition = 7 - (i % 8); // position of bit to rightshift by
             byte messageByte = messageBytes[messageBytesArrayIndex]; // current byte value we are xoring
-            int messageBit = (messageByte >>> bitShiftPosition) & 1; // shift and mask to get leftmost bit
+            int messageBit = (messageByte >>> bitShiftPosition) & 1; // shift and mask to get the bit to be XORed
 
             // xor the bit with key
             int encryptedBit = messageBit ^ keyBit;
@@ -31,7 +30,6 @@ public final class Cipher {
         }
 
         return encryptedMessage;
-
     }
 
 }

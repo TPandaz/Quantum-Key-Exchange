@@ -7,7 +7,11 @@ import java.util.ArrayList;
 public class QKE {
     public static void main(String[] args) {
         if (args.length != 1) {
-            System.err.println("Usage: java QKE <QubitStreamLength>");
+            System.err.println("Usage: java QKE <QubitStreamLength(int)>");
+            System.exit(1);
+        }
+        if(Integer.parseInt(args[0]) <= 0){
+            System.err.println("qubitStreamLength should be a positive number");
             System.exit(1);
         }
         int qubitLength = Integer.parseInt(args[0]);
@@ -25,7 +29,7 @@ public class QKE {
 
         System.out.println("receiver's keys: " + receiver.getKey());
         System.out.println("sender's keys: " + sender.getKey());
-        System.out.println("Type Message: ");
+        System.out.println("Type Message below(type quit to exit program): ");
 
         // sender encrypts chars typed in console and sends to receiver, receiver
         // decrypts message and prints to console
@@ -84,6 +88,7 @@ public class QKE {
     }
 
     public static boolean isKeyValid(String key){
+        //checks if key is not null, not empty, not "0", not a number other than 0 or 1, not a string of only 0s
         if(key == null || key.isEmpty() || key.equals("0") || !key.matches("^[01]+$") || key.matches("^0*$")){
             System.out.println("Key not valid...reestablishing keys");
             return false;

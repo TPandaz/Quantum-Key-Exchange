@@ -285,7 +285,7 @@ public class UnitTests {
         }
 
         @Test
-        @DisplayName("Test when key is longet than message, correct ouput")
+        @DisplayName("Test when key is longer than message, correct ouput")
         public void testLongKey() {
             byte[] messageBytes = "h".getBytes(StandardCharsets.UTF_8);
             String key = "11011011101010000101010101110111101010110101010";
