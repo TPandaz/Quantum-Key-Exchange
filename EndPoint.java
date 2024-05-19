@@ -22,8 +22,10 @@ public class EndPoint {
 
     // setter
     public void setKey(ArrayList<Qubit> senderStream, ArrayList<Qubit> receiverStream) {
-        // compare polarisation types and append to key the value of qubits with
-        // matching polarizations
+        if(senderStream.size() != receiverStream.size()){
+            throw new IllegalArgumentException("Qubit stream lengths are different!");
+        }
+        // compare polarisation types and append to key the value of qubits with matching polarizations
         key.setLength(0);
         for (int i = 0; i < senderStream.size(); i++) {
             if (senderStream.get(i).getPolarization() == receiverStream.get(i).getPolarization()) {

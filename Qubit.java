@@ -10,16 +10,25 @@ public class Qubit {
 
     // constructor which substitutes the new method in the Qubit class diagram
     public Qubit(int value, int polarization) {
+        if((value != 0 && value != 1) || (polarization != 0 && polarization!= 1)){
+            throw new IllegalArgumentException("Invalid Parameters");
+        }
         this.value = value;
         this.polarization = polarization;
     }
 
     public void set(int value, int polarization) {
+        if((value != 0 && value != 1) || (polarization != 0 && polarization!= 1)){
+            throw new IllegalArgumentException("Invalid Parameters");
+        }
         this.value = value;
         this.polarization = polarization;
     }
 
     public int measure(int polarization) {
+        if(polarization != 0 && polarization!= 1){
+            throw new IllegalArgumentException("Invalid Polarization");
+        }
         if (polarization == this.polarization) {
             return this.value;
         } else {
